@@ -26,6 +26,7 @@ public sealed partial class SidePopup : UserControl
             case DockSide.Left:
                 {
                     Width = double.IsNaN(Document.Width) ? Manager.PopupContainer!.ActualWidth / 3 : Document.Width;
+                    Document.Width = double.NaN;
                     Height = Manager.PopupContainer!.ActualHeight;
 
                     Layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new(1, GridUnitType.Star) });
@@ -42,6 +43,7 @@ public sealed partial class SidePopup : UserControl
                 {
                     Width = Manager.PopupContainer!.ActualWidth;
                     Height = double.IsNaN(Document.Height) ? Manager.PopupContainer!.ActualHeight / 3 : Document.Height;
+                    Document.Height = double.NaN;
 
                     Layout.RowDefinitions.Add(new RowDefinition { Height = new(1, GridUnitType.Star) });
                     Layout.RowDefinitions.Add(new RowDefinition { Height = new(1, GridUnitType.Auto) });
@@ -56,6 +58,7 @@ public sealed partial class SidePopup : UserControl
             case DockSide.Right:
                 {
                     Width = double.IsNaN(Document.Width) ? Manager.PopupContainer!.ActualWidth / 3 : Document.Width;
+                    Document.Width = double.NaN;
                     Height = Manager.PopupContainer!.ActualHeight;
 
                     Layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new(1, GridUnitType.Auto) });
@@ -72,6 +75,7 @@ public sealed partial class SidePopup : UserControl
                 {
                     Width = Manager.PopupContainer!.ActualWidth;
                     Height = double.IsNaN(Document.Height) ? Manager.PopupContainer!.ActualHeight / 3 : Document.Height;
+                    Document.Height = double.NaN;
 
                     Layout.RowDefinitions.Add(new RowDefinition { Height = new(1, GridUnitType.Auto) });
                     Layout.RowDefinitions.Add(new RowDefinition { Height = new(1, GridUnitType.Star) });
