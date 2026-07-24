@@ -89,7 +89,80 @@ LayoutPanel.xaml
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="dock:LayoutPanel">
-          <Grid x:Name="PART_Root" ColumnSpacing="12" RowSpacing="12" />
+          <Grid x:Name="PART_Root" ColumnSpacing="12" RowSpacing="12">
+            <Grid.Resources>
+              <Style x:Key="PART_DefaultSplitterStyle" TargetType="toolkit:GridSplitter">
+                <Setter Property="IsTabStop" Value="True" />
+                <Setter Property="UseSystemFocusVisuals" Value="True" />
+                <Setter Property="IsFocusEngagementEnabled" Value="True" />
+                <Setter Property="MinHeight" Value="12" />
+                <Setter Property="MinWidth" Value="12" />
+                <Setter Property="Padding" Value="4" />
+                <Setter Property="Foreground" Value="{ThemeResource ControlStrongFillColorDefaultBrush}" />
+                <Setter Property="Background" Value="{ThemeResource ControlAltFillColorTransparentBrush}" />
+                <Setter Property="ManipulationMode" Value="TranslateX,TranslateY" />
+                <Setter Property="Template">
+                  <Setter.Value>
+                    <ControlTemplate TargetType="toolkit:GridSplitter">
+                      <Grid Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                          <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="PointerOver">
+                              <VisualState.Setters>
+                                <Setter Target="Track.Background" Value="{ThemeResource ControlAltFillColorTertiaryBrush}" />
+                              </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                              <VisualState.Setters>
+                                <Setter Target="Track.Background" Value="{ThemeResource ControlAltFillColorQuarternaryBrush}" />
+                              </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Disabled">
+                              <VisualState.Setters>
+                                <Setter Target="Track.Background" Value="{ThemeResource ControlAltFillColorDisabledBrush}" />
+                                <Setter Target="PART_Thumb.Opacity" Value="0.45" />
+                              </VisualState.Setters>
+                            </VisualState>
+                          </VisualStateGroup>
+                          <VisualStateGroup x:Name="OrientationStates">
+                            <VisualState x:Name="Vertical">
+                              <VisualState.Setters>
+                                <Setter Target="Track.Width" Value="{ThemeResource LayoutPanelSplitterVisualThickness}" />
+                                <Setter Target="Track.Height" Value="Auto" />
+                              </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Horizontal">
+                              <VisualState.Setters>
+                                <Setter Target="Track.Width" Value="Auto" />
+                                <Setter Target="Track.Height" Value="{ThemeResource LayoutPanelSplitterVisualThickness}" />
+                                <Setter Target="PART_Thumb.Width" Value="24" />
+                                <Setter Target="PART_Thumb.Height" Value="4" />
+                              </VisualState.Setters>
+                            </VisualState>
+                          </VisualStateGroup>
+                          <VisualStateGroup x:Name="ThumbVisibilityStates">
+                            <VisualState x:Name="Visible" />
+                            <VisualState x:Name="Collapsed">
+                              <VisualState.Setters>
+                                <Setter Target="PART_Thumb.Visibility" Value="Collapsed" />
+                              </VisualState.Setters>
+                            </VisualState>
+                          </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Grid x:Name="Track" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{TemplateBinding Background}">
+                          <Grid.BackgroundTransition>
+                            <BrushTransition Duration="0:0:0.083" />
+                          </Grid.BackgroundTransition>
+                          <Rectangle x:Name="PART_Thumb" Width="4" Height="24" Margin="{TemplateBinding Padding}" Fill="{TemplateBinding Foreground}" RadiusX="2" RadiusY="2" />
+                        </Grid>
+                      </Grid>
+                    </ControlTemplate>
+                  </Setter.Value>
+                </Setter>
+              </Style>
+            </Grid.Resources>
+          </Grid>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
