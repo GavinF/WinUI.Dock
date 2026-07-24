@@ -152,13 +152,13 @@ LayoutPanel.xaml
                           <Grid.BackgroundTransition>
                             <BrushTransition Duration="0:0:0.083" />
                           </Grid.BackgroundTransition>
-                          <Rectangle x:Name="PART_Thumb" Width="4" Height="24" Margin="{TemplateBinding Padding}" Fill="{TemplateBinding Foreground}" RadiusX="2" RadiusY="2" />
+                          <Rectangle x:Name="PART_Thumb" Width="4" Height="24" Fill="{TemplateBinding Foreground}" RadiusX="2" RadiusY="2" />
                         </Grid>
                         <Grid x:Name="HorizontalTrack" Height="{Binding Path=(dock:LayoutPanel.SplitterTrackThickness), RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{TemplateBinding Background}" Visibility="Collapsed">
                           <Grid.BackgroundTransition>
                             <BrushTransition Duration="0:0:0.083" />
                           </Grid.BackgroundTransition>
-                          <Rectangle x:Name="HorizontalThumb" Width="24" Height="4" Margin="{TemplateBinding Padding}" Fill="{TemplateBinding Foreground}" RadiusX="2" RadiusY="2" />
+                          <Rectangle x:Name="HorizontalThumb" Width="24" Height="4" Fill="{TemplateBinding Foreground}" RadiusX="2" RadiusY="2" />
                         </Grid>
                       </Grid>
                     </ControlTemplate>

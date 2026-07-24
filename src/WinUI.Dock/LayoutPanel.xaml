@@ -81,7 +81,6 @@
                                                     <Rectangle x:Name="PART_Thumb"
                                                                Width="4"
                                                                Height="24"
-                                                               Margin="{TemplateBinding Padding}"
                                                                Fill="{TemplateBinding Foreground}"
                                                                RadiusX="2"
                                                                RadiusY="2" />
@@ -98,7 +97,6 @@
                                                     <Rectangle x:Name="HorizontalThumb"
                                                                Width="24"
                                                                Height="4"
-                                                               Margin="{TemplateBinding Padding}"
                                                                Fill="{TemplateBinding Foreground}"
                                                                RadiusX="2"
                                                                RadiusY="2" />
