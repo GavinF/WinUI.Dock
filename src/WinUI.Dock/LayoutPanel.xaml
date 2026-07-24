@@ -31,34 +31,31 @@
                                                         <VisualState x:Name="Normal" />
                                                         <VisualState x:Name="PointerOver">
                                                             <VisualState.Setters>
-                                                                <Setter Target="Track.Background" Value="{ThemeResource ControlAltFillColorTertiaryBrush}" />
+                                                                <Setter Target="VerticalTrack.Background" Value="{ThemeResource ControlAltFillColorTertiaryBrush}" />
+                                                                <Setter Target="HorizontalTrack.Background" Value="{ThemeResource ControlAltFillColorTertiaryBrush}" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                         <VisualState x:Name="Pressed">
                                                             <VisualState.Setters>
-                                                                <Setter Target="Track.Background" Value="{ThemeResource ControlAltFillColorQuarternaryBrush}" />
+                                                                <Setter Target="VerticalTrack.Background" Value="{ThemeResource ControlAltFillColorQuarternaryBrush}" />
+                                                                <Setter Target="HorizontalTrack.Background" Value="{ThemeResource ControlAltFillColorQuarternaryBrush}" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                         <VisualState x:Name="Disabled">
                                                             <VisualState.Setters>
-                                                                <Setter Target="Track.Background" Value="{ThemeResource ControlAltFillColorDisabledBrush}" />
+                                                                <Setter Target="VerticalTrack.Background" Value="{ThemeResource ControlAltFillColorDisabledBrush}" />
+                                                                <Setter Target="HorizontalTrack.Background" Value="{ThemeResource ControlAltFillColorDisabledBrush}" />
                                                                 <Setter Target="PART_Thumb.Opacity" Value="0.45" />
+                                                                <Setter Target="HorizontalThumb.Opacity" Value="0.45" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                     </VisualStateGroup>
                                                     <VisualStateGroup x:Name="OrientationStates">
-                                                        <VisualState x:Name="Vertical">
-                                                            <VisualState.Setters>
-                                                                <Setter Target="Track.Width" Value="{ThemeResource LayoutPanelSplitterVisualThickness}" />
-                                                                <Setter Target="Track.Height" Value="Auto" />
-                                                            </VisualState.Setters>
-                                                        </VisualState>
+                                                        <VisualState x:Name="Vertical" />
                                                         <VisualState x:Name="Horizontal">
                                                             <VisualState.Setters>
-                                                                <Setter Target="Track.Width" Value="Auto" />
-                                                                <Setter Target="Track.Height" Value="{ThemeResource LayoutPanelSplitterVisualThickness}" />
-                                                                <Setter Target="PART_Thumb.Width" Value="24" />
-                                                                <Setter Target="PART_Thumb.Height" Value="4" />
+                                                                <Setter Target="VerticalTrack.Visibility" Value="Collapsed" />
+                                                                <Setter Target="HorizontalTrack.Visibility" Value="Visible" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                     </VisualStateGroup>
@@ -67,14 +64,16 @@
                                                         <VisualState x:Name="Collapsed">
                                                             <VisualState.Setters>
                                                                 <Setter Target="PART_Thumb.Visibility" Value="Collapsed" />
+                                                                <Setter Target="HorizontalThumb.Visibility" Value="Collapsed" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                     </VisualStateGroup>
                                                 </VisualStateManager.VisualStateGroups>
 
-                                                <Grid x:Name="Track"
+                                                <Grid x:Name="VerticalTrack"
+                                                      Width="{Binding Path=(dock:LayoutPanel.SplitterTrackThickness), RelativeSource={RelativeSource TemplatedParent}}"
                                                       HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"
+                                                      VerticalAlignment="Stretch"
                                                       Background="{TemplateBinding Background}">
                                                     <Grid.BackgroundTransition>
                                                         <BrushTransition Duration="0:0:0.083" />
@@ -82,6 +81,23 @@
                                                     <Rectangle x:Name="PART_Thumb"
                                                                Width="4"
                                                                Height="24"
+                                                               Margin="{TemplateBinding Padding}"
+                                                               Fill="{TemplateBinding Foreground}"
+                                                               RadiusX="2"
+                                                               RadiusY="2" />
+                                                </Grid>
+                                                <Grid x:Name="HorizontalTrack"
+                                                      Height="{Binding Path=(dock:LayoutPanel.SplitterTrackThickness), RelativeSource={RelativeSource TemplatedParent}}"
+                                                      HorizontalAlignment="Stretch"
+                                                      VerticalAlignment="Center"
+                                                      Background="{TemplateBinding Background}"
+                                                      Visibility="Collapsed">
+                                                    <Grid.BackgroundTransition>
+                                                        <BrushTransition Duration="0:0:0.083" />
+                                                    </Grid.BackgroundTransition>
+                                                    <Rectangle x:Name="HorizontalThumb"
+                                                               Width="24"
+                                                               Height="4"
                                                                Margin="{TemplateBinding Padding}"
                                                                Fill="{TemplateBinding Foreground}"
                                                                RadiusX="2"

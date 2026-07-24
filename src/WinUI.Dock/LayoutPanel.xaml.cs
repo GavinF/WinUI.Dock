@@ -27,6 +27,11 @@ public partial class LayoutPanel : DockContainer
                                                                                                    typeof(LayoutPanel),
                                                                                                    new PropertyMetadata(null, OnSplitterLayoutPropertyChanged));
 
+    public static readonly DependencyProperty SplitterTrackThicknessProperty = DependencyProperty.RegisterAttached("SplitterTrackThickness",
+                                                                                                                   typeof(double),
+                                                                                                                   typeof(LayoutPanel),
+                                                                                                                   new PropertyMetadata(12d));
+
     private Grid? root;
 
     public LayoutPanel()
@@ -56,6 +61,16 @@ public partial class LayoutPanel : DockContainer
     {
         get => (Style?)GetValue(SplitterStyleProperty);
         set => SetValue(SplitterStyleProperty, value);
+    }
+
+    public static double GetSplitterTrackThickness(DependencyObject element)
+    {
+        return (double)element.GetValue(SplitterTrackThicknessProperty);
+    }
+
+    public static void SetSplitterTrackThickness(DependencyObject element, double value)
+    {
+        element.SetValue(SplitterTrackThicknessProperty, value);
     }
 
     protected override void InitTemplate()
@@ -294,7 +309,7 @@ public partial class LayoutPanel : DockContainer
 
     private void ApplySplitterLayout(GridSplitter splitter)
     {
-        splitter.Resources["LayoutPanelSplitterVisualThickness"] = Math.Max(0, SplitterVisualThickness);
+        SetSplitterTrackThickness(splitter, Math.Max(0, SplitterVisualThickness));
         splitter.Style = SplitterStyle ?? root?.Resources["PART_DefaultSplitterStyle"] as Style;
         ApplySplitterTransform(splitter);
     }
