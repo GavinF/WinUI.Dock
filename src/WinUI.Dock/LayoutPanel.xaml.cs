@@ -12,6 +12,26 @@ public partial class LayoutPanel : DockContainer
                                                                                                 typeof(LayoutPanel),
                                                                                                 new PropertyMetadata(Orientation.Vertical));
 
+    public static readonly DependencyProperty SpacingProperty = DependencyProperty.Register(nameof(Spacing),
+                                                                                            typeof(double),
+                                                                                            typeof(LayoutPanel),
+                                                                                            new PropertyMetadata(12d, OnSplitterLayoutPropertyChanged));
+
+    public static readonly DependencyProperty SplitterVisualThicknessProperty = DependencyProperty.Register(nameof(SplitterVisualThickness),
+                                                                                                             typeof(double),
+                                                                                                             typeof(LayoutPanel),
+                                                                                                             new PropertyMetadata(12d, OnSplitterLayoutPropertyChanged));
+
+    public static readonly DependencyProperty SplitterStyleProperty = DependencyProperty.Register(nameof(SplitterStyle),
+                                                                                                   typeof(Style),
+                                                                                                   typeof(LayoutPanel),
+                                                                                                   new PropertyMetadata(null, OnSplitterLayoutPropertyChanged));
+
+    public static readonly DependencyProperty SplitterTrackThicknessProperty = DependencyProperty.RegisterAttached("SplitterTrackThickness",
+                                                                                                                   typeof(double),
+                                                                                                                   typeof(LayoutPanel),
+                                                                                                                   new PropertyMetadata(12d));
+
     private Grid? root;
 
     public LayoutPanel()
@@ -25,9 +45,38 @@ public partial class LayoutPanel : DockContainer
         set => SetValue(OrientationProperty, value);
     }
 
+    public double Spacing
+    {
+        get => (double)GetValue(SpacingProperty);
+        set => SetValue(SpacingProperty, value);
+    }
+
+    public double SplitterVisualThickness
+    {
+        get => (double)GetValue(SplitterVisualThicknessProperty);
+        set => SetValue(SplitterVisualThicknessProperty, value);
+    }
+
+    public Style? SplitterStyle
+    {
+        get => (Style?)GetValue(SplitterStyleProperty);
+        set => SetValue(SplitterStyleProperty, value);
+    }
+
+    public static double GetSplitterTrackThickness(DependencyObject element)
+    {
+        return (double)element.GetValue(SplitterTrackThicknessProperty);
+    }
+
+    public static void SetSplitterTrackThickness(DependencyObject element, double value)
+    {
+        element.SetValue(SplitterTrackThicknessProperty, value);
+    }
+
     protected override void InitTemplate()
     {
         root = GetTemplateChild("PART_Root") as Grid;
+        ApplySplitterLayout();
     }
 
     protected override void InitChildren()
@@ -156,13 +205,7 @@ public partial class LayoutPanel : DockContainer
 
             for (int i = 1; i < Children.Count; i++)
             {
-                GridSplitter splitter = new()
-                {
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    ResizeDirection = GridSplitter.GridResizeDirection.Rows,
-                    RenderTransform = new TranslateTransform() { Y = -12 }
-                };
+                GridSplitter splitter = CreateSplitter(GridSplitter.GridResizeDirection.Rows);
 
                 Grid.SetRow(splitter, i);
 
@@ -194,18 +237,101 @@ public partial class LayoutPanel : DockContainer
 
             for (int i = 1; i < Children.Count; i++)
             {
-                GridSplitter splitter = new()
-                {
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    ResizeDirection = GridSplitter.GridResizeDirection.Columns,
-                    RenderTransform = new TranslateTransform() { X = -12 }
-                };
+                GridSplitter splitter = CreateSplitter(GridSplitter.GridResizeDirection.Columns);
 
                 Grid.SetColumn(splitter, i);
 
                 root.Children.Add(splitter);
             }
+        }
+    }
+
+    private static void OnSplitterLayoutPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+    {
+        if (sender is LayoutPanel panel)
+        {
+            panel.ApplySplitterLayout();
+        }
+    }
+
+    private GridSplitter CreateSplitter(GridSplitter.GridResizeDirection resizeDirection)
+    {
+        GridSplitter splitter = new()
+        {
+            HorizontalAlignment = resizeDirection == GridSplitter.GridResizeDirection.Rows
+                ? HorizontalAlignment.Stretch
+                : HorizontalAlignment.Left,
+            VerticalAlignment = resizeDirection == GridSplitter.GridResizeDirection.Rows
+                ? VerticalAlignment.Top
+                : VerticalAlignment.Stretch,
+            ResizeDirection = resizeDirection,
+            RenderTransform = new TranslateTransform()
+        };
+
+        splitter.Loaded += OnSplitterLoaded;
+        splitter.SizeChanged += OnSplitterSizeChanged;
+        ApplySplitterLayout(splitter);
+        return splitter;
+    }
+
+    private void OnSplitterLoaded(object sender, RoutedEventArgs args)
+    {
+        if (sender is GridSplitter splitter)
+        {
+            ApplySplitterTransform(splitter);
+        }
+    }
+
+    private void OnSplitterSizeChanged(object sender, SizeChangedEventArgs args)
+    {
+        if (sender is GridSplitter splitter)
+        {
+            ApplySplitterTransform(splitter);
+        }
+    }
+
+    private void ApplySplitterLayout()
+    {
+        if (root is null)
+        {
+            return;
+        }
+
+        double spacing = Math.Max(0, Spacing);
+        root.ColumnSpacing = spacing;
+        root.RowSpacing = spacing;
+
+        foreach (GridSplitter splitter in root.Children.OfType<GridSplitter>())
+        {
+            ApplySplitterLayout(splitter);
+        }
+    }
+
+    private void ApplySplitterLayout(GridSplitter splitter)
+    {
+        SetSplitterTrackThickness(splitter, Math.Max(0, SplitterVisualThickness));
+        splitter.Style = SplitterStyle ?? root?.Resources["PART_DefaultSplitterStyle"] as Style;
+        ApplySplitterTransform(splitter);
+    }
+
+    private void ApplySplitterTransform(GridSplitter splitter)
+    {
+        bool resizeRows = splitter.ResizeDirection == GridSplitter.GridResizeDirection.Rows;
+        double splitterExtent = resizeRows ? splitter.ActualHeight : splitter.ActualWidth;
+        if (splitterExtent <= 0)
+        {
+            splitterExtent = resizeRows ? splitter.MinHeight : splitter.MinWidth;
+        }
+        if (splitterExtent <= 0)
+        {
+            splitterExtent = 12;
+        }
+
+        double centeredOffset = -(splitterExtent + Math.Max(0, Spacing)) / 2;
+        if (splitter.RenderTransform is TranslateTransform transform)
+        {
+            transform.X = resizeRows ? 0 : centeredOffset;
+            transform.Y = resizeRows ? centeredOffset : 0;
         }
     }
 }
