@@ -147,21 +147,25 @@ public sealed partial class DockTabItem : TabViewItem
 
     private void Pin_Click(object _, RoutedEventArgs __)
     {
-        DockManager manager = Document!.Root!;
+        Document document = Document!;
+        DockManager manager = document.Root!;
 
-        switch (Document.PreferredSide)
+        // Remove the document from its current container before the side collection assigns the new root.
+        document.Detach();
+
+        switch (document.PreferredSide)
         {
             case DockSide.Left:
-                TryInsert(manager.LeftSide, Document);
+                TryInsert(manager.LeftSide, document);
                 break;
             case DockSide.Top:
-                TryInsert(manager.TopSide, Document);
+                TryInsert(manager.TopSide, document);
                 break;
             case DockSide.Right:
-                TryInsert(manager.RightSide, Document);
+                TryInsert(manager.RightSide, document);
                 break;
             case DockSide.Bottom:
-                TryInsert(manager.BottomSide, Document);
+                TryInsert(manager.BottomSide, document);
                 break;
             default:
                 {
@@ -172,30 +176,28 @@ public sealed partial class DockTabItem : TabViewItem
                     double right = manager.ActualWidth - point.X;
                     double bottom = manager.ActualHeight - point.Y;
 
-                    if (Document.ActualWidth < Document.ActualHeight)
+                    if (document.ActualWidth < document.ActualHeight)
                     {
                         if (left < right)
                         {
-                            manager.LeftSide.Add(Document);
+                            manager.LeftSide.Add(document);
                         }
                         else
                         {
-                            manager.RightSide.Add(Document);
+                            manager.RightSide.Add(document);
                         }
                     }
                     else if (top < bottom)
                     {
-                        manager.TopSide.Add(Document);
+                        manager.TopSide.Add(document);
                     }
                     else
                     {
-                        manager.BottomSide.Add(Document);
+                        manager.BottomSide.Add(document);
                     }
                 }
                 break;
         }
-
-        Document.Detach();
 
         // Reference: Comments on lines 91-92.
         FloatingWindowHelpers.CloseEmptyWindows(manager);

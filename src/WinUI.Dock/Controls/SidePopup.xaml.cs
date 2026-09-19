@@ -147,7 +147,10 @@ public sealed partial class SidePopup : UserControl
 
     private void Header_PointerPressed(object _, PointerRoutedEventArgs __)
     {
-        Document!.Root!.ActiveDocument = Document;
+        if (Document is Document document)
+        {
+            Manager.ActiveDocument = document;
+        }
     }
 
     private void Pin_Click(object _, RoutedEventArgs __)
