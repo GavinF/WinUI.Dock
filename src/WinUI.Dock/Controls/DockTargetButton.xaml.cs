@@ -38,18 +38,27 @@ public sealed partial class DockTargetButton : UserControl
     {
         base.OnDragEnter(e);
 
-        if (Destination is DockManager manager)
-        {
-            string documentKey = (string)await e.DataView.GetDataAsync(DragDropHelpers.DocumentKey);
+        // Capture UI-owned state before WinRT completes the data request on an arbitrary thread.
+        var dispatcher_queue = DispatcherQueue;
+        var destination = Destination;
+        var target = Target;
 
-            if (DragDropHelpers.GetDocument(documentKey) is Document document)
+        if (destination is DockManager manager)
+        {
+            var document_key = (string)await e.DataView.GetDataAsync(DragDropHelpers.DocumentKey);
+
+            // Return preview changes to the XAML thread that owns the dock controls.
+            if (DragDropHelpers.GetDocument(document_key) is Document document)
             {
-                manager.ShowDockPreview(document, Target);
+                if (!dispatcher_queue.TryEnqueue(() => manager.ShowDockPreview(document, target)))
+                {
+                    System.Diagnostics.Debug.WriteLine("Dock preview was discarded because the UI dispatcher is shutting down.");
+                }
             }
         }
-        else if (Destination is DocumentGroup group)
+        else if (destination is DocumentGroup group)
         {
-            group.ShowDockPreview(Target);
+            group.ShowDockPreview(target);
         }
     }
 
@@ -78,24 +87,36 @@ public sealed partial class DockTargetButton : UserControl
     {
         base.OnDrop(e);
 
-        string documentKey = (string)await e.DataView.GetDataAsync(DragDropHelpers.DocumentKey);
+        // Capture dependency properties while still on the XAML thread.
+        var dispatcher_queue = DispatcherQueue;
+        var destination = Destination;
+        var target = Target;
+        var document_key = (string)await e.DataView.GetDataAsync(DragDropHelpers.DocumentKey);
 
-        if (DragDropHelpers.GetDocument(documentKey) is Document document)
+        // Perform every dock-tree mutation on the dispatcher that owns the controls.
+        if (DragDropHelpers.GetDocument(document_key) is Document document)
         {
-            if (Destination is DockManager manager)
-            {
-                document.ResetPreferredSide(Target);
+            var drop_enqueued = dispatcher_queue.TryEnqueue(
+                () =>
+                {
+                    if (destination is DockManager manager)
+                    {
+                        document.ResetPreferredSide(target);
 
-                manager.HideDockPreview();
-                manager.Dock(document, Target);
-            }
-            else if (Destination is DocumentGroup group)
-            {
-                group.HideDockPreview();
-                group.Dock(document, Target);
-            }
+                        manager.HideDockPreview();
+                        manager.Dock(document, target);
+                    }
+                    else if (destination is DocumentGroup group)
+                    {
+                        group.HideDockPreview();
+                        group.Dock(document, target);
+                    }
 
-            document.Root!.HideDockTargets();
+                    document.Root!.HideDockTargets();
+                }
+            );
+            if (!drop_enqueued)
+                System.Diagnostics.Debug.WriteLine("Dock operation was discarded because the UI dispatcher is shutting down.");
         }
     }
 
