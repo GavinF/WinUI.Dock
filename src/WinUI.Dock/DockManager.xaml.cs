@@ -253,8 +253,23 @@ public partial class DockManager : Control
                               HorizontalAlignment.Stretch,
                               VerticalAlignment.Bottom);
                 break;
+            case DockTarget.PinLeft:
+                preview?.Show(PinPreviewThickness, double.NaN, HorizontalAlignment.Left, VerticalAlignment.Stretch);
+                break;
+            case DockTarget.PinTop:
+                preview?.Show(double.NaN, PinPreviewThickness, HorizontalAlignment.Stretch, VerticalAlignment.Top);
+                break;
+            case DockTarget.PinRight:
+                preview?.Show(PinPreviewThickness, double.NaN, HorizontalAlignment.Right, VerticalAlignment.Stretch);
+                break;
+            case DockTarget.PinBottom:
+                preview?.Show(double.NaN, PinPreviewThickness, HorizontalAlignment.Stretch, VerticalAlignment.Bottom);
+                break;
         }
     }
+
+    // Width of the strip previewed where a pinned document's sidebar tab will appear.
+    private const double PinPreviewThickness = 32;
 
     internal void HideDockPreview()
     {
@@ -325,6 +340,43 @@ public partial class DockManager : Control
     internal void HideDockTargets()
     {
         VisualStateManager.GoToState(this, "HideDockTargets", false);
+    }
+
+    // Auto-hides the document into the sidebar on the given side, honouring its remembered sidebar position when it has one.
+    internal void Pin(Document document, DockSide side)
+    {
+        // Remove the document from its current container before the side collection assigns the new root.
+        document.Detach();
+
+        switch (side)
+        {
+            case DockSide.Left:
+                InsertPinned(LeftSide, document);
+                break;
+            case DockSide.Top:
+                InsertPinned(TopSide, document);
+                break;
+            case DockSide.Right:
+                InsertPinned(RightSide, document);
+                break;
+            case DockSide.Bottom:
+                InsertPinned(BottomSide, document);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(side), side, null);
+        }
+
+        static void InsertPinned(ObservableCollection<Document> documents, Document document)
+        {
+            if (document.PreferredSideIndex is not -1 && documents.FirstOrDefault(item => item.PreferredSideIndex > document.PreferredSideIndex) is Document existingDocument)
+            {
+                documents.Insert(documents.IndexOf(existingDocument), document);
+            }
+            else
+            {
+                documents.Add(document);
+            }
+        }
     }
 
     private void OnSideCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

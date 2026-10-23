@@ -66,6 +66,10 @@ LayoutPanel.xaml
               <dock:DockTargetButton HorizontalAlignment="Center" VerticalAlignment="Top" Destination="{Binding RelativeSource={RelativeSource TemplatedParent}}" Target="DockTop" />
               <dock:DockTargetButton HorizontalAlignment="Right" VerticalAlignment="Center" Destination="{Binding RelativeSource={RelativeSource TemplatedParent}}" Target="DockRight" />
               <dock:DockTargetButton HorizontalAlignment="Center" VerticalAlignment="Bottom" Destination="{Binding RelativeSource={RelativeSource TemplatedParent}}" Target="DockBottom" />
+              <dock:DockTargetButton Margin="0,80,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Destination="{Binding RelativeSource={RelativeSource TemplatedParent}}" Target="PinLeft" />
+              <dock:DockTargetButton Margin="80,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Destination="{Binding RelativeSource={RelativeSource TemplatedParent}}" Target="PinTop" />
+              <dock:DockTargetButton Margin="0,80,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Destination="{Binding RelativeSource={RelativeSource TemplatedParent}}" Target="PinRight" />
+              <dock:DockTargetButton Margin="80,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Destination="{Binding RelativeSource={RelativeSource TemplatedParent}}" Target="PinBottom" />
             </Grid>
             <dock:Preview x:Name="PART_Preview" Grid.Row="1" Grid.Column="1" Visibility="Collapsed" />
           </Grid>

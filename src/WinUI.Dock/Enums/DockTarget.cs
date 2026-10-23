@@ -1,4 +1,4 @@
-﻿namespace WinUI.Dock;
+namespace WinUI.Dock;
 
 public enum DockTarget
 {
@@ -18,5 +18,13 @@ public enum DockTarget
 
     DockRight,
 
-    DockBottom
+    DockBottom,
+
+    PinLeft,
+
+    PinTop,
+
+    PinRight,
+
+    PinBottom
 }

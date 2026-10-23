@@ -104,7 +104,25 @@ public sealed partial class DockTargetButton : UserControl
                         document.ResetPreferredSide(target);
 
                         manager.HideDockPreview();
-                        manager.Dock(document, target);
+
+                        switch (target)
+                        {
+                            case DockTarget.PinLeft:
+                                manager.Pin(document, DockSide.Left);
+                                break;
+                            case DockTarget.PinTop:
+                                manager.Pin(document, DockSide.Top);
+                                break;
+                            case DockTarget.PinRight:
+                                manager.Pin(document, DockSide.Right);
+                                break;
+                            case DockTarget.PinBottom:
+                                manager.Pin(document, DockSide.Bottom);
+                                break;
+                            default:
+                                manager.Dock(document, target);
+                                break;
+                        }
                     }
                     else if (destination is DocumentGroup group)
                     {

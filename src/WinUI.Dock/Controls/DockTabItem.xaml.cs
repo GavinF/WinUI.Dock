@@ -150,69 +150,32 @@ public sealed partial class DockTabItem : TabViewItem
         Document document = Document!;
         DockManager manager = document.Root!;
 
-        // Remove the document from its current container before the side collection assigns the new root.
-        document.Detach();
+        DockSide side = document.PreferredSide;
 
-        switch (document.PreferredSide)
+        // Without a remembered side, choose the nearest edge in the direction of the document's longer axis.
+        if (!Enum.IsDefined(side))
         {
-            case DockSide.Left:
-                TryInsert(manager.LeftSide, document);
-                break;
-            case DockSide.Top:
-                TryInsert(manager.TopSide, document);
-                break;
-            case DockSide.Right:
-                TryInsert(manager.RightSide, document);
-                break;
-            case DockSide.Bottom:
-                TryInsert(manager.BottomSide, document);
-                break;
-            default:
-                {
-                    Point point = TransformToVisual(manager).TransformPoint(new Point(0, 0));
+            Point point = TransformToVisual(manager).TransformPoint(new Point(0, 0));
 
-                    double left = point.X;
-                    double top = point.Y;
-                    double right = manager.ActualWidth - point.X;
-                    double bottom = manager.ActualHeight - point.Y;
+            double left = point.X;
+            double top = point.Y;
+            double right = manager.ActualWidth - point.X;
+            double bottom = manager.ActualHeight - point.Y;
 
-                    if (document.ActualWidth < document.ActualHeight)
-                    {
-                        if (left < right)
-                        {
-                            manager.LeftSide.Add(document);
-                        }
-                        else
-                        {
-                            manager.RightSide.Add(document);
-                        }
-                    }
-                    else if (top < bottom)
-                    {
-                        manager.TopSide.Add(document);
-                    }
-                    else
-                    {
-                        manager.BottomSide.Add(document);
-                    }
-                }
-                break;
-        }
-
-        // Reference: Comments on lines 91-92.
-        FloatingWindowHelpers.CloseEmptyWindows(manager);
-
-        static void TryInsert(ObservableCollection<Document> documents, Document document)
-        {
-            if (document.PreferredSideIndex is not -1 && documents.FirstOrDefault(item => item.PreferredSideIndex > document.PreferredSideIndex) is Document existingDocument)
+            if (document.ActualWidth < document.ActualHeight)
             {
-                documents.Insert(documents.IndexOf(existingDocument), document);
+                side = left < right ? DockSide.Left : DockSide.Right;
             }
             else
             {
-                documents.Add(document);
+                side = top < bottom ? DockSide.Top : DockSide.Bottom;
             }
         }
+
+        manager.Pin(document, side);
+
+        // Reference: Comments on lines 91-92.
+        FloatingWindowHelpers.CloseEmptyWindows(manager);
     }
 
     private void Close_Click(object _, RoutedEventArgs __)
