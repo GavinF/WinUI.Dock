@@ -89,10 +89,14 @@ public sealed partial class SidePopup : UserControl
                 break;
         }
 
+        // A popup is not in the manager's visual tree, so give it the manager's resolved theme explicitly or its content resolves theme brushes from the app default.
+        RequestedTheme = Manager.ActualTheme;
+
         popup = new()
         {
             Child = this,
             IsLightDismissEnabled = true,
+            RequestedTheme = Manager.ActualTheme,
             XamlRoot = Manager.PopupContainer!.XamlRoot
         };
 
@@ -107,10 +111,11 @@ public sealed partial class SidePopup : UserControl
 
     public void Show()
     {
+        // Attach before opening so the content loads inside the manager's themed visual tree.
+        Manager.PopupContainer!.Child = popup;
         popup.IsOpen = true;
 
         Manager.ActiveDocument = Document;
-        Manager.PopupContainer!.Child = popup;
     }
 
     private void OnSizeChanged(object _, SizeChangedEventArgs __)
